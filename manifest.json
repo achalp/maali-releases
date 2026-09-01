@@ -1,7 +1,7 @@
 {
-  "version": "0.2.2",
-  "url": "https://github.com/achalp/maali-releases/releases/download/v0.2.2-drill2/maali.bin",
-  "sha256": "8a8a5f43104ea2c20b8ad5d1c6646afd5e0c90c8e67bedd55efedd954789204b",
+  "version": "0.2.1",
+  "url": "https://github.com/achalp/maali-releases/releases/download/v0.2.1/maali.bin",
+  "sha256": "10357182d749446a34901371868d3439f7fdfa266d7ac1d53ccea29f27638914",
   "min_version": "0.1.0",
-  "notes": "DRILL ONLY: deliberately broken; aborts at boot"
+  "notes": "Maali 0.2.1"
 }
