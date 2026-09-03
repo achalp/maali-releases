@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Maali — Recover a controller</title>
+<meta name="description" content="Flash Maali onto a replacement ESP32-S3 board from your browser. No software to install.">
+<link rel="canonical" href="https://updates.getmaali.com/flash/">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 18'%3E%3Ccircle cx='9' cy='9' r='8' fill='none' stroke='%233E7C3A' stroke-width='1.4'/%3E%3Cpath d='M9 13.5V6.2M9 6.2C9 6.2 6.2 6.6 6.2 9c0 0 2.8.3 2.8-2.8Zm0 2.9c0 0 2.8.4 2.8-2 0 0-2.8-.3-2.8 2Z' fill='none' stroke='%233E7C3A' stroke-width='1.3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<style>
+:root{
+  --ground:#FBFAF2;--paper:#FFFFFF;--leaf-wash:#EEF5E7;
+  --leaf:#3E7C3A;--leaf-deep:#274D22;--lime:#7FB846;
+  --water:#1F87A6;--water-deep:#16657E;--soil:#B4652A;--soil-fill:rgba(180,101,42,.10);
+  --ink:#20301C;--ink-soft:#4E5E45;--ink-faint:#7C8A72;--rule:#DBE3CF;--rule-soft:#E8EEDD;
+  --shadow-md:0 6px 22px rgba(39,77,34,.10),0 2px 6px rgba(39,77,34,.06);
+}
+*{box-sizing:border-box}
+body{margin:0;background:
+  radial-gradient(90% 60% at 80% -10%,rgba(127,184,70,.18),transparent 55%),
+  linear-gradient(180deg,var(--leaf-wash),var(--ground) 40%);
+  color:var(--ink);font-family:"Newsreader",Georgia,serif;font-size:18px;line-height:1.62;
+  -webkit-font-smoothing:antialiased;min-height:100vh}
+.wrap{max-width:720px;margin:0 auto;padding:0 24px 80px}
+a{color:var(--water-deep);text-underline-offset:3px}
+h1,h2,h3,.ui,.brand,.tag{font-family:"Archivo",system-ui,sans-serif}
+.mono{font-family:"IBM Plex Mono",ui-monospace,monospace}
+header{display:flex;align-items:center;gap:10px;padding:22px 0 8px}
+.brand{font-weight:700;letter-spacing:-.02em;font-size:18px;color:var(--leaf-deep);display:flex;align-items:center;gap:9px}
+.brand a{color:inherit;text-decoration:none;display:flex;align-items:center;gap:9px}
+header nav{margin-left:auto;font-family:"Archivo",sans-serif;font-size:14px}
+header nav a{color:var(--ink-soft);text-decoration:none}
+header nav a:hover{color:var(--leaf)}
+.tag{font-size:11.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--leaf);margin-top:26px}
+h1{font-size:clamp(30px,5vw,46px);font-weight:700;line-height:1.05;letter-spacing:-.03em;color:var(--leaf-deep);margin:.3em 0 0;text-wrap:balance}
+.lede{font-size:20px;color:var(--ink-soft);margin:18px 0 0;max-width:56ch}
+.card{background:var(--paper);border:1px solid var(--rule);border-radius:18px;box-shadow:var(--shadow-md);padding:26px 26px;margin:34px 0}
+.card h2{font-size:20px;color:var(--leaf-deep);margin:0 0 6px}
+.flashrow{display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center;padding:8px 0 2px}
+esp-web-install-button{--esp-tools-button-color:#fff;--esp-tools-button-text-color:#fff}
+.btn{display:inline-flex;align-items:center;gap:9px;font-family:"Archivo",sans-serif;font-size:16px;font-weight:600;
+  border:0;border-radius:999px;padding:14px 26px;background:var(--leaf);color:#fff;cursor:pointer;
+  box-shadow:var(--shadow-md);transition:transform .12s ease,background .15s ease;text-decoration:none}
+.btn:hover{background:var(--leaf-deep);transform:translateY(-2px)}
+.unsupported{display:none;background:var(--soil-fill);border-left:4px solid var(--soil);border-radius:0 12px 12px 0;padding:14px 18px;color:var(--ink);font-size:15px}
+.steps{margin:0;padding:0;list-style:none;counter-reset:s}
+.steps li{counter-increment:s;display:grid;grid-template-columns:34px 1fr;gap:14px;align-items:baseline;padding:11px 0;border-top:1px solid var(--rule-soft)}
+.steps li:first-child{border-top:0}
+.steps li::before{content:counter(s);font-family:"Archivo",sans-serif;font-weight:700;font-size:14px;color:#fff;background:var(--leaf);
+  width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+.steps b{color:var(--ink)}
+.warn{background:#fff;border:1.5px solid var(--soil);border-radius:14px;padding:18px 20px;margin:22px 0}
+.warn .tag{margin:0 0 6px;color:var(--soil)}
+.warn p{margin:.3em 0;font-size:15.5px;color:var(--ink)}
+.warn code{font-family:"IBM Plex Mono",monospace;font-size:14px;background:var(--leaf-wash);padding:.1em .4em;border-radius:4px}
+.fine{font-size:14px;color:var(--ink-faint);line-height:1.55}
+.chip{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--ink-faint);border:1px solid var(--rule);border-radius:999px;padding:4px 11px;display:inline-block}
+footer{border-top:1px solid var(--rule);margin-top:40px;padding-top:20px;font-size:13.5px;color:var(--ink-faint);font-family:"IBM Plex Mono",monospace;display:flex;gap:14px;flex-wrap:wrap}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <span class="brand"><a href="https://maali.garden/">
+      <svg width="20" height="20" viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="9" r="8" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M9 13.5V6.2M9 6.2C9 6.2 6.2 6.6 6.2 9c0 0 2.8.3 2.8-2.8Zm0 2.9c0 0 2.8.4 2.8-2 0 0-2.8-.3-2.8 2Z" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      maali</a></span>
+    <nav><a href="https://maali.garden/">Back to the garden</a></nav>
+  </header>
+
+  <span class="tag">Bring a controller back to life</span>
+  <h1>Put Maali on a fresh board, from your browser.</h1>
+  <p class="lede">If a controller board ever gives out, you do not wait on us for a replacement. Buy the same board off the shelf, plug it into this computer, and this page writes Maali onto it. No software to install, no cable but the one in the box.</p>
+
+  <div class="card">
+    <div class="flashrow">
+      <esp-web-install-button manifest="manifest.json">
+        <button class="btn" slot="activate">
+          <svg width="17" height="17" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1v9m0 0 3-3M8 10 5 7M2.5 11.5v2A1.5 1.5 0 0 0 4 15h8a1.5 1.5 0 0 0 1.5-1.5v-2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Flash Maali onto this board
+        </button>
+        <span slot="unsupported"></span>
+        <span slot="not-allowed"></span>
+      </esp-web-install-button>
+      <span class="chip">firmware 0.2.1 &middot; ESP32-S3 &middot; ~1.5&nbsp;MB</span>
+    </div>
+    <div class="unsupported" id="nowebserial">
+      <b>This browser can't talk to the board.</b> Flashing needs Chrome or Edge on a
+      laptop or desktop (they carry the connection this uses; Safari and Firefox do not,
+      and phones can't do it at all). Open this page in Chrome or Edge and the button
+      above will come to life.
+    </div>
+  </div>
+
+  <div class="warn">
+    <span class="tag">Two things to get right</span>
+    <p><b>It must be the same board.</b> Maali is fitted to the
+      <code>Waveshare ESP32-S3-RS485-CAN</code> (external-antenna version) &mdash; the exact
+      one on the parts list. A different ESP32 board has its wires in different places and
+      will not work. If in doubt, order the board from the
+      <a href="https://maali.garden/#cost">parts list</a>.</p>
+    <p><b>This is a clean slate.</b> A fresh flash gives you a brand-new Maali with no yard,
+      no network, and no password &mdash; exactly like the day you first built one. When it
+      restarts it puts up its own setup network (look for <code>maali-XXXXXX</code>); join it,
+      open <code>http://192.168.4.1</code>, and walk the setup again. If you kept a settings
+      backup, restore it there and you are done in a minute.</p>
+  </div>
+
+  <div class="card">
+    <h2>How it goes</h2>
+    <ol class="steps">
+      <li><span><b>Get the board.</b> The same Waveshare ESP32-S3-RS485-CAN from the parts list. New out of the packet is fine.</span></li>
+      <li><span><b>Plug it into this computer</b> with a USB-C cable &mdash; the same port you would use to charge a phone.</span></li>
+      <li><span><b>Press the button above</b> and, when the little window asks, choose the board from the list of ports.</span></li>
+      <li><span><b>Wait about a minute.</b> It erases, writes, and checks itself. Do not unplug it while it works.</span></li>
+      <li><span><b>Fit it back in the cabinet</b> and walk the setup, or restore your backup. The garden is watered again.</span></li>
+    </ol>
+  </div>
+
+  <p class="fine">Nothing here leaves your computer except the one download of the firmware
+    itself. The writing happens locally, over the cable, between this page and the board.
+    Prefer the command line? The same image is published as
+    <span class="mono">maali-factory.bin</span> with each
+    <a href="https://github.com/achalp/maali-releases/releases">release</a>, flashable with
+    <span class="mono">esptool</span> at offset <span class="mono">0x0</span>.</p>
+
+  <footer>
+    <span>maali.garden</span><span>&middot;</span><span>recover a controller</span><span>&middot;</span><span>local first, yours</span>
+  </footer>
+</div>
+
+<script type="module" src="ewt/install-button.js"></script>
+<script>
+  // Light up the honest fallback when the browser can't do WebSerial.
+  if (!('serial' in navigator)) {
+    document.getElementById('nowebserial').style.display = 'block';
+  }
+</script>
+</body>
+</html>
