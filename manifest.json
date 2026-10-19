@@ -1,8 +1,8 @@
 {
-  "version": "0.14.0",
-  "url": "https://github.com/achalp/maali-releases/releases/download/v0.14.0/maali-waveshare-8ch.bin",
-  "sha256": "c0e8ba9e0d62df82621e23c1bc3b909ad3ae23e2e0827495d7861e0bfa879003",
+  "version": "0.14.1",
+  "url": "https://github.com/achalp/maali-releases/releases/download/v0.14.1/maali-waveshare-8ch.bin",
+  "sha256": "1728ba9244ff3463a086bd52963c2b97cd0820963e5665a07232e7e5f3b68949",
   "board": "waveshare-8ch",
   "min_version": "0.1.0",
-  "notes": "Maali 0.14.0"
+  "notes": "Maali 0.14.1"
 }
