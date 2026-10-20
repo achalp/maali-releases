@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Maali — Recover a controller</title>
-<meta name="description" content="Flash Maali onto a replacement ESP32-S3 board from your browser. No software to install.">
+<meta name="description" content="Flash Maali onto a replacement controller board, Waveshare or Maali's own, from your browser. No software to install.">
 <link rel="canonical" href="https://updates.getmaali.com/flash/">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 18'%3E%3Ccircle cx='9' cy='9' r='8' fill='none' stroke='%233E7C3A' stroke-width='1.4'/%3E%3Cpath d='M9 13.5V6.2M9 6.2C9 6.2 6.2 6.6 6.2 9c0 0 2.8.3 2.8-2.8Zm0 2.9c0 0 2.8.4 2.8-2 0 0-2.8-.3-2.8 2Z' fill='none' stroke='%233E7C3A' stroke-width='1.3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
 <style>
@@ -56,6 +56,21 @@ esp-web-install-button{--esp-tools-button-color:#fff;--esp-tools-button-text-col
 .fine{font-size:14px;color:var(--ink-faint);line-height:1.55}
 .chip{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--ink-faint);border:1px solid var(--rule);border-radius:999px;padding:4px 11px;display:inline-block}
 footer{border-top:1px solid var(--rule);margin-top:40px;padding-top:20px;font-size:13.5px;color:var(--ink-faint);font-family:"IBM Plex Mono",monospace;display:flex;gap:14px;flex-wrap:wrap}
+
+.choose{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:14px 0 4px}
+@media (max-width:560px){.choose{grid-template-columns:1fr}}
+.board{font-family:"Archivo",sans-serif;text-align:left;background:var(--paper);border:1.5px solid var(--rule);border-radius:14px;
+  padding:16px 18px;cursor:pointer;color:var(--ink);transition:border-color .15s ease,box-shadow .15s ease}
+.board:hover{border-color:var(--leaf)}
+.board[aria-pressed="true"]{border-color:var(--leaf);box-shadow:0 0 0 3px var(--leaf-wash)}
+.board b{display:block;font-size:16px;color:var(--leaf-deep);margin-bottom:4px}
+.board span{display:block;font-family:"Newsreader",Georgia,serif;font-size:15px;color:var(--ink-soft);line-height:1.45}
+.board .mono{font-size:12.5px;color:var(--ink-faint)}
+.chosen{display:none}
+.chosen[data-show]{display:block}
+.note{display:none}
+.note[data-show]{display:block}
+.hint{font-size:15px;color:var(--ink-soft);margin:12px 0 0;text-align:center}
 </style>
 </head>
 <body>
@@ -72,26 +87,43 @@ footer{border-top:1px solid var(--rule);margin-top:40px;padding-top:20px;font-si
   <p class="lede">If a controller board ever gives out, you do not wait on us for a replacement. Buy the same board off the shelf, plug it into this computer, and this page writes Maali onto it. No software to install, no cable but the one in the box.</p>
 
   <div class="card">
-    <div class="flashrow">
-      <esp-web-install-button manifest="manifest.json">
-        <button class="btn" slot="activate">
-          <svg width="17" height="17" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1v9m0 0 3-3M8 10 5 7M2.5 11.5v2A1.5 1.5 0 0 0 4 15h8a1.5 1.5 0 0 0 1.5-1.5v-2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          Flash Maali onto this board
-        </button>
-        <span slot="unsupported"></span>
-        <span slot="not-allowed"></span>
-      </esp-web-install-button>
-      <span class="chip">firmware 0.2.1 &middot; ESP32-S3 &middot; ~1.5&nbsp;MB</span>
+    <span class="tag" style="margin-top:0">First, which board is it?</span>
+    <div class="choose" role="group" aria-label="Which board">
+      <button class="board" type="button" aria-pressed="false" data-board="waveshare-8ch">
+        <b>Waveshare ESP32-S3-RS485-CAN</b>
+        <span>The off-the-shelf module from the parts list. Its name is printed on it, and its USB-C socket powers it.</span>
+        <span class="mono">writes maali-factory-waveshare-8ch.bin</span>
+      </button>
+      <button class="board" type="button" aria-pressed="false" data-board="maali-v2">
+        <b>The Maali board</b>
+        <span>Maali&rsquo;s own board: eight relays on it, a 24&nbsp;VAC terminal marked <code>J7</code>, and a second small chip that guards the valves.</span>
+        <span class="mono">writes maali-factory-maali-v2.bin</span>
+      </button>
     </div>
-    <div class="unsupported" id="nowebserial">
-      <b>This browser can't talk to the board.</b> Flashing needs Chrome or Edge on a
-      laptop or desktop (they carry the connection this uses; Safari and Firefox do not,
-      and phones can't do it at all). Open this page in Chrome or Edge and the button
-      above will come to life.
+    <p class="hint" id="hint">The two take different firmware. Pick yours and the button appears; the confirmation window names the board again before anything is written.</p>
+
+    <div class="chosen" id="chosen">
+      <div class="flashrow">
+        <esp-web-install-button id="ewb">
+          <button class="btn" slot="activate">
+            <svg width="17" height="17" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1v9m0 0 3-3M8 10 5 7M2.5 11.5v2A1.5 1.5 0 0 0 4 15h8a1.5 1.5 0 0 0 1.5-1.5v-2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span id="btnlabel">Flash Maali onto this board</span>
+          </button>
+          <span slot="unsupported"></span>
+          <span slot="not-allowed"></span>
+        </esp-web-install-button>
+        <span class="chip" id="chip">firmware &middot; ESP32-S3</span>
+      </div>
+      <div class="unsupported" id="nowebserial">
+        <b>This browser can't talk to the board.</b> Flashing needs Chrome or Edge on a
+        laptop or desktop (they carry the connection this uses; Safari and Firefox do not,
+        and phones can't do it at all). Open this page in Chrome or Edge and the button
+        above will come to life.
+      </div>
     </div>
   </div>
 
-  <div class="warn">
+  <div class="warn note" id="note-waveshare-8ch">
     <span class="tag">Two things to get right</span>
     <p><b>It must be the same board.</b> Maali is fitted to the
       <code>Waveshare ESP32-S3-RS485-CAN</code> (external-antenna version) &mdash; the exact
@@ -107,12 +139,35 @@ footer{border-top:1px solid var(--rule);margin-top:40px;padding-top:20px;font-si
       done in a minute instead of rebuilding the yard by hand.</p>
   </div>
 
+  <div class="warn note" id="note-maali-v2">
+    <span class="tag">Four things to get right</span>
+    <p><b>Power it from the cabinet first.</b> The Maali board's USB socket carries data
+      only; it runs on the 24&nbsp;VAC at its <code>J7</code> terminal and nothing else. Have
+      the transformer connected and on before you plug in the USB cable, and keep it on
+      while the page writes.</p>
+    <p><b>Press the little RESET button when it is done.</b> After the write the board sits
+      waiting for more, and a cable alone cannot wake it. Press the button marked
+      <code>RESET</code> (<code>SW2</code>), or switch the 24&nbsp;VAC off and on. The
+      status light and the setup network tell you it is up.</p>
+    <p><b>Brand-new board? Leave the valve wires off for the first start.</b> The small chip
+      that guards the valves is written by Maali itself the first time it boots, which takes a
+      few seconds. Until that has happened a new chip can hold zone&nbsp;8 on, and the
+      check that follows clicks zone&nbsp;1 for a fraction of a second. A board that has run
+      Maali before needs none of this.</p>
+    <p><b>This is a clean slate.</b> A fresh flash gives you a brand-new Maali with no yard,
+      no network, and no password. When it restarts it puts up its own setup network (look
+      for <code>maali-XXXXXX</code>); join it, open <code>http://192.168.4.1</code>, and walk
+      the setup again. <b>If you can still reach the old controller, download a settings
+      backup first</b> (its Settings page, under <em>The controller</em>) &mdash; then
+      restore it on the new board and you are done in a minute.</p>
+  </div>
+
   <div class="card">
     <h2>How it goes</h2>
     <ol class="steps">
-      <li><span><b>Get the board.</b> The same Waveshare ESP32-S3-RS485-CAN from the parts list. New out of the packet is fine.</span></li>
-      <li><span><b>Plug it into this computer</b> with a USB-C cable &mdash; the same port you would use to charge a phone.</span></li>
-      <li><span><b>Press the button above</b> and, when the little window asks, choose the board from the list of ports.</span></li>
+      <li><span><b>Pick the board above.</b> The firmware is cut to the board; the wrong one will not work and the page will not offer it until you choose.</span></li>
+      <li><span><b>Plug it into this computer</b> with a USB-C cable &mdash; the same port you would use to charge a phone. The Maali board also needs its 24&nbsp;VAC on.</span></li>
+      <li><span><b>Press the button</b> and, when the little window asks, choose the board from the list of ports. The window names the board you picked; read it before you confirm.</span></li>
       <li><span><b>Wait about a minute.</b> It erases, writes, and checks itself. Do not unplug it while it works.</span></li>
       <li><span><b>Fit it back in the cabinet</b> and walk the setup, or restore your backup. The garden is watered again.</span></li>
     </ol>
@@ -120,9 +175,10 @@ footer{border-top:1px solid var(--rule);margin-top:40px;padding-top:20px;font-si
 
   <p class="fine">Nothing here leaves your computer except the one download of the firmware
     itself. The writing happens locally, over the cable, between this page and the board.
-    Prefer the command line? The same image is published as
-    <span class="mono">maali-factory.bin</span> with each
-    <a href="https://github.com/achalp/maali-releases/releases">release</a>, flashable with
+    Prefer the command line? The same images are published with each
+    <a href="https://github.com/achalp/maali-releases/releases">release</a> as
+    <span class="mono">maali-factory-waveshare-8ch.bin</span> and
+    <span class="mono">maali-factory-maali-v2.bin</span>, flashable with
     <span class="mono">esptool</span> at offset <span class="mono">0x0</span>.</p>
 
   <footer>
@@ -132,10 +188,49 @@ footer{border-top:1px solid var(--rule);margin-top:40px;padding-top:20px;font-si
 
 <script type="module" src="ewt/install-button.js"></script>
 <script>
-  // Light up the honest fallback when the browser can't do WebSerial.
-  if (!('serial' in navigator)) {
-    document.getElementById('nowebserial').style.display = 'block';
-  }
+  // The chooser is a safety control, not a convenience (ADR 0013 §7e): both
+  // boards are ESP32-S3, so one ESP Web Tools manifest cannot tell them apart.
+  // Nothing is offered until a board is named, the manifest's own name is what
+  // the confirmation window shows, and the choice is never remembered.
+  (function () {
+    var ewb = document.getElementById('ewb');
+    var chosen = document.getElementById('chosen');
+    var hint = document.getElementById('hint');
+    var chip = document.getElementById('chip');
+    var boards = document.querySelectorAll('.board');
+    var image = {
+      'waveshare-8ch': 'maali-factory-waveshare-8ch.bin',
+      'maali-v2': 'maali-factory-maali-v2.bin'
+    };
+    function describe(slug) {
+      var manifest = 'manifest-' + slug + '.json';
+      chip.textContent = 'firmware · ESP32-S3';
+      fetch(manifest, { cache: 'no-store' }).then(function (r) { return r.json(); }).then(function (m) {
+        var text = 'firmware ' + m.version + ' · ESP32-S3';
+        chip.textContent = text;
+        return fetch(image[slug], { method: 'HEAD', cache: 'no-store' }).then(function (r) {
+          var n = Number(r.headers.get('content-length'));
+          if (n > 0) chip.textContent = text + ' · ~' + (n / 1048576).toFixed(1) + ' MB';
+        });
+      }).catch(function () {});
+    }
+    boards.forEach(function (b) {
+      b.addEventListener('click', function () {
+        var slug = b.getAttribute('data-board');
+        boards.forEach(function (o) { o.setAttribute('aria-pressed', o === b ? 'true' : 'false'); });
+        document.querySelectorAll('.note').forEach(function (n) { n.removeAttribute('data-show'); });
+        document.getElementById('note-' + slug).setAttribute('data-show', '');
+        ewb.setAttribute('manifest', 'manifest-' + slug + '.json');
+        chosen.setAttribute('data-show', '');
+        hint.textContent = 'Writing Maali for ' + b.querySelector('b').textContent + '. The confirmation window names it again.';
+        describe(slug);
+      });
+    });
+    // Light up the honest fallback when the browser can't do WebSerial.
+    if (!('serial' in navigator)) {
+      document.getElementById('nowebserial').style.display = 'block';
+    }
+  })();
 </script>
 </body>
 </html>

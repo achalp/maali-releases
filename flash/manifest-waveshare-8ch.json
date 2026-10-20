@@ -1,0 +1,16 @@
+{
+  "name": "Maali for the Waveshare ESP32-S3-RS485-CAN",
+  "version": "0.14.2",
+  "new_install_prompt_erase": false,
+  "builds": [
+    {
+      "chipFamily": "ESP32-S3",
+      "parts": [
+        {
+          "path": "maali-factory-waveshare-8ch.bin",
+          "offset": 0
+        }
+      ]
+    }
+  ]
+}

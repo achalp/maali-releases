@@ -1,0 +1,16 @@
+{
+  "name": "Maali for the Maali board (maali-v2)",
+  "version": "0.14.2",
+  "new_install_prompt_erase": false,
+  "builds": [
+    {
+      "chipFamily": "ESP32-S3",
+      "parts": [
+        {
+          "path": "maali-factory-maali-v2.bin",
+          "offset": 0
+        }
+      ]
+    }
+  ]
+}
