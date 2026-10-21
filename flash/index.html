@@ -124,12 +124,17 @@ footer{border-top:1px solid var(--rule);margin-top:40px;padding-top:20px;font-si
   </div>
 
   <div class="warn note" id="note-waveshare-8ch">
-    <span class="tag">Two things to get right</span>
+    <span class="tag">Three things to get right</span>
     <p><b>It must be the same board.</b> Maali is fitted to the
       <code>Waveshare ESP32-S3-RS485-CAN</code> (external-antenna version) &mdash; the exact
       one on the parts list. A different ESP32 board has its wires in different places and
       will not work. If in doubt, order the board from the
       <a href="https://maali.garden/#cost">parts list</a>.</p>
+    <p><b>If the page cannot connect, put the board into its programming mode by hand.</b>
+      Hold <code>BOOT</code>, press and release <code>RESET</code>, then release
+      <code>BOOT</code>. The board now waits for the write and runs nothing else, which is
+      what you want when whatever is on it keeps restarting ("the device has been lost" is
+      how the page reports that). Flash, then press <code>RESET</code> once more at the end.</p>
     <p><b>This is a clean slate.</b> A fresh flash gives you a brand-new Maali with no yard,
       no network, and no password &mdash; exactly like the day you first built one. When it
       restarts it puts up its own setup network (look for <code>maali-XXXXXX</code>); join it,
@@ -140,7 +145,7 @@ footer{border-top:1px solid var(--rule);margin-top:40px;padding-top:20px;font-si
   </div>
 
   <div class="warn note" id="note-maali-v2">
-    <span class="tag">Four things to get right</span>
+    <span class="tag">Five things to get right</span>
     <p><b>Power it from the cabinet first.</b> The Maali board's USB socket carries data
       only; it runs on the 24&nbsp;VAC at its <code>J7</code> terminal and nothing else. Have
       the transformer connected and on before you plug in the USB cable, and keep it on
@@ -149,6 +154,11 @@ footer{border-top:1px solid var(--rule);margin-top:40px;padding-top:20px;font-si
       waiting for more, and a cable alone cannot wake it. Press the button marked
       <code>RESET</code> (<code>SW2</code>), or switch the 24&nbsp;VAC off and on. The
       status light and the setup network tell you it is up.</p>
+    <p><b>If the page cannot connect, put the board into its programming mode by hand.</b>
+      Hold <code>BOOT</code> (<code>SW1</code>), press and release <code>RESET</code>
+      (<code>SW2</code>), then release <code>BOOT</code>. The board now waits for the write and runs nothing else, which is
+      what you want when whatever is on it keeps restarting ("the device has been lost" is
+      how the page reports that). Flash, then press <code>RESET</code> once more at the end.</p>
     <p><b>Brand-new board? Leave the valve wires off for the first start.</b> The small chip
       that guards the valves is written by Maali itself the first time it boots, which takes a
       few seconds. Until that has happened a new chip can hold zone&nbsp;8 on, and the
