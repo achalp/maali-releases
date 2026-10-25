@@ -1,6 +1,6 @@
 {
   "name": "Maali for the Waveshare ESP32-S3-RS485-CAN",
-  "version": "0.16.0",
+  "version": "0.16.1",
   "new_install_prompt_erase": false,
   "builds": [
     {
