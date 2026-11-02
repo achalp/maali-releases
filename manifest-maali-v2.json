@@ -1,8 +1,8 @@
 {
-  "version": "0.16.5",
-  "url": "https://github.com/achalp/maali-releases/releases/download/v0.16.5/maali-maali-v2.bin",
-  "sha256": "68ea40b8adacd2b458e80eab57f7356d8fc0d64f5210313e12f178ab5148f427",
+  "version": "0.17.0",
+  "url": "https://github.com/achalp/maali-releases/releases/download/v0.17.0/maali-maali-v2.bin",
+  "sha256": "336bf80faa1f8d7f41fcf186009a6d882487f7d4733f59a278f725d254dfef56",
   "board": "maali-v2",
   "min_version": "0.1.0",
-  "notes": "Maali 0.16.5"
+  "notes": "Maali 0.17.0"
 }
