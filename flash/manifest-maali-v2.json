@@ -1,6 +1,6 @@
 {
   "name": "Maali for the Maali board (maali-v2)",
-  "version": "0.19.2",
+  "version": "0.19.3",
   "new_install_prompt_erase": false,
   "builds": [
     {
